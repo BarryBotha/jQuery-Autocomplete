@@ -5,7 +5,7 @@
 *  Ajax Autocomplete for jQuery is freely distributable under the terms of an MIT-style license.
 *  For details, see the web site: http://www.devbridge.com/projects/autocomplete/jquery/
 *
-*  Last Review: 07/24/2012
+*  Last Review: 09/15/2012
 */
 
 /*jslint onevar: true, evil: true, nomen: true, eqeqeq: true, bitwise: true, regexp: true, newcap: true, immed: true */
@@ -45,7 +45,8 @@
 			params: {},
 			fnFormatResult: fnFormatResult,
 			delimiter: null,
-			zIndex: 9999
+			zIndex: 9999,
+			httpMethod: 'GET'
 		};
 		this.initialize();
 		this.setOptions(options);
@@ -253,7 +254,7 @@
 
 		getSuggestions: function (q) {
 
-			var cr, me;
+			var cr, me, ajaxSettings;
 			cr = this.isLocal ? this.getSuggestionsLocal(q) : this.cachedResponse[q]; //dadeta this.options.isLocal ||
 			if (cr && $.isArray(cr.suggestions)) {
 				this.suggestions = cr.suggestions;
@@ -262,7 +263,13 @@
 			} else if (!this.isBadQuery(q)) {
 				me = this;
 				me.options.params.query = q;
-				$.get(this.serviceUrl, me.options.params, function (txt) { me.processResponse(txt); }, 'text');
+				ajaxSettings={
+					data: me.options.params,
+					success: function (txt) { me.processResponse(txt); },
+					dataType: 'text',
+					type: me.options.httpMethod
+				};
+				$.ajax(this.serviceUrl, ajaxSettings);
 			}
 		},
 
